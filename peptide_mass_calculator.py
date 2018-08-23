@@ -62,7 +62,7 @@ def getUniqueAA(sequence):
     return uniqueAA
 
 # This function builds the dictionary ofcalculated masses of ions,
-# using smae process as the iOS app
+# using same process as the iOS app
 def populateMassDictionary(mass, sequence, uniqueAA, dictOfAA):
     massDictionary = {} # Formating will be {Float : String}
     # exact masses of the ions used throughout script
@@ -73,12 +73,11 @@ def populateMassDictionary(mass, sequence, uniqueAA, dictOfAA):
     maxAggregate = 2
     z = 0
 
-
     # define all of the variables to keep track of things
     numTFAester = 0
     numBoc = 0
     numtBu = 0
-    numTrT = 0
+    numTrt = 0
     numGuan = 0
 
     # counts how many, and what kind, of side reactions can occur
@@ -147,7 +146,7 @@ def populateMassDictionary(mass, sequence, uniqueAA, dictOfAA):
                     # Na K masses
                     elif i == 0 and j >= 0 and k >= 0:
                         ionMass = ionMass / (float(j) + float(k))
-                        z = i + k
+                        z = j + k
                         massDictionary[ionMass] = f"[{l}M + {j}Na + {k}K]{z}+"
 
                     # H Na K masses
@@ -158,8 +157,284 @@ def populateMassDictionary(mass, sequence, uniqueAA, dictOfAA):
                     else:
                         continue
 
-    return massDictionary
+                    # Calculates Boc additions, if its possible
+                    if numBoc > 0:
+                        for x in range(1, numBoc + 1):
+                            ionMass = (mass + dictOfAA['Boc']) * float(l) + (float(i) * H + float(j) * Na + float(k) * K )
 
+                            if i == 0 and j == 0 and k == 0:
+                                continue
+                            elif i + j + k > maxCharge:
+                                continue
+
+                            # H masses
+                            elif i >= 1 and j == 0 and k == 0:
+                                ionMass = ionMass / float(i)
+                                z = i
+                                massDictionary[ionMass] = f"[{l}M + {x}Boc + {i}H]{z}+"
+
+                            # Na masses
+                            elif i == 0 and j >= 1 and k == 0:
+                                ionMass = ionMass / float(j)
+                                z = j
+                                massDictionary[ionMass] = f"[{l}M + {x}Boc + {j}Na]{z}+"
+
+                            # K masses
+                            elif i == 0 and j == 0 and k >= 1:
+                                ionMass = ionMass / float(k)
+                                z = k
+                                massDictionary[ionMass] = f"[{l}M + {x}Boc + {k}K]{z}+"
+
+                            # H Na masses
+                            elif i >= 1 and j >= 0 and k == 0:
+                                ionMass = ionMass / (float(i) + float(j))
+                                z = i + j
+                                massDictionary[ionMass] = f"[{l}M + {x}Boc + {i}H + {j}Na]{z}+"
+
+                            # H K masses
+                            elif i >= 1 and j == 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(k))
+                                z = i + k
+                                massDictionary[ionMass] = f"[{l}M + {x}Boc + {i}H + {k}K]{z}+"
+
+                            # Na K masses
+                            elif i == 0 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(j) + float(k))
+                                z = j + k
+                                massDictionary[ionMass] = f"[{l}M + {x}Boc + {j}Na + {k}K]{z}+"
+
+                            # H Na K masses
+                            elif i >= 1 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(j) + float(k))
+                                z = i + j + k
+                                massDictionary[ionMass] = f"[{l}M + {x}Boc + {i}H + {j}Na + {k}K]{z}+"
+                            else:
+                                continue
+
+                    # Calculates tBu
+                    if numtBu > 0:
+                        for x in range(1, numtBu + 1):
+                            ionMass = (mass + dictOfAA['tBu']) * float(l) + (float(i) * H + float(j) * Na + float(k) * K )
+
+                            if i == 0 and j == 0 and k == 0:
+                                continue
+                            elif i + j + k > maxCharge:
+                                continue
+
+                            # H masses
+                            elif i >= 1 and j == 0 and k == 0:
+                                ionMass = ionMass / float(i)
+                                z = i
+                                massDictionary[ionMass] = f"[{l}M + {x}tBu + {i}H]{z}+"
+
+                            # Na masses
+                            elif i == 0 and j >= 1 and k == 0:
+                                ionMass = ionMass / float(j)
+                                z = j
+                                massDictionary[ionMass] = f"[{l}M + {x}tBu + {j}Na]{z}+"
+
+                            # K masses
+                            elif i == 0 and j == 0 and k >= 1:
+                                ionMass = ionMass / float(k)
+                                z = k
+                                massDictionary[ionMass] = f"[{l}M + {x}tBu + {k}K]{z}+"
+
+                            # H Na masses
+                            elif i >= 1 and j >= 0 and k == 0:
+                                ionMass = ionMass / (float(i) + float(j))
+                                z = i + j
+                                massDictionary[ionMass] = f"[{l}M + {x}tBu + {i}H + {j}Na]{z}+"
+
+                            # H K masses
+                            elif i >= 1 and j == 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(k))
+                                z = i + k
+                                massDictionary[ionMass] = f"[{l}M + {x}tBu + {i}H + {k}K]{z}+"
+
+                            # Na K masses
+                            elif i == 0 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(j) + float(k))
+                                z = j + k
+                                massDictionary[ionMass] = f"[{l}M + {x}tBu + {j}Na + {k}K]{z}+"
+
+                            # H Na K masses
+                            elif i >= 1 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(j) + float(k))
+                                z = i + j + k
+                                massDictionary[ionMass] = f"[{l}M + {x}tBu + {i}H + {j}Na + {k}K]{z}+"
+                            else:
+                                continue
+
+                    # Calculates Trt and Acm
+                    if numTrt > 0:
+                        for x in range(1, numTrT + 1):
+                            ionMass = (mass + dictOfAA['Trt']) * float(l) + (float(i) * H + float(j) * Na + float(k) * K )
+                            ionMass1 = (mass + dictOfAA['Acm']) * float(l) + (float(i) * H + float(j) * Na + float(k) * K )
+
+                            if i == 0 and j == 0 and k == 0:
+                                continue
+                            elif i + j + k > maxCharge:
+                                continue
+
+                            # H masses
+                            elif i >= 1 and j == 0 and k == 0:
+                                ionMass = ionMass / float(i)
+                                z = i
+                                massDictionary[ionMass] = f"[{l}M + {x}Trt + {i}H]{z}+"
+                                massDictionary[ionMass1] = f"[{l}M + {x}Acm + {i}H]{z}+"
+
+                            # Na masses
+                            elif i == 0 and j >= 1 and k == 0:
+                                ionMass = ionMass / float(j)
+                                z = j
+                                massDictionary[ionMass] = f"[{l}M + {x}Trt + {j}Na]{z}+"
+                                massDictionary[ionMass1] = f"[{l}M + {x}Acm + {j}Na]{z}+"
+
+                            # K masses
+                            elif i == 0 and j == 0 and k >= 1:
+                                ionMass = ionMass / float(k)
+                                z = k
+                                massDictionary[ionMass] = f"[{l}M + {x}Trt + {k}K]{z}+"
+                                massDictionary[ionMass1] = f"[{l}M + {x}Acm + {k}K]{z}+"
+
+                            # H Na masses
+                            elif i >= 1 and j >= 0 and k == 0:
+                                ionMass = ionMass / (float(i) + float(j))
+                                z = i + j
+                                massDictionary[ionMass] = f"[{l}M + {x}Trt + {i}H + {j}Na]{z}+"
+                                massDictionary[ionMass1] = f"[{l}M + {x}Acm + {i}H + {j}Na]{z}+"
+
+                            # H K masses
+                            elif i >= 1 and j == 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(k))
+                                z = i + k
+                                massDictionary[ionMass] = f"[{l}M + {x}Trt + {i}H + {k}K]{z}+"
+                                massDictionary[ionMass1] = f"[{l}M + {x}Acm + {i}H + {k}K]{z}+"
+
+                            # Na K masses
+                            elif i == 0 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(j) + float(k))
+                                z = j + k
+                                massDictionary[ionMass] = f"[{l}M + {x}Trt + {j}Na + {k}K]{z}+"
+                                massDictionary[ionMass1] = f"[{l}M + {x}Acm + {j}Na + {k}K]{z}+"
+
+                            # H Na K masses
+                            elif i >= 1 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(j) + float(k))
+                                z = i + j + k
+                                massDictionary[ionMass] = f"[{l}M + {x}Trt + {i}H + {j}Na + {k}K]{z}+"
+                                massDictionary[ionMass1] = f"[{l}M + {x}Acm + {i}H + {j}Na + {k}K]{z}+"
+                            else:
+                                continue
+
+                    # Calculates TFA esters
+                    if numTFAester > 0:
+                        for x in range(1, numTFAester + 1):
+                            ionMass = (mass + dictOfAA['TFAester']) * float(l) + (float(i) * H + float(j) * Na + float(k) * K )
+
+                            if i == 0 and j == 0 and k == 0:
+                                continue
+                            elif i + j + k > maxCharge:
+                                continue
+
+                            # H masses
+                            elif i >= 1 and j == 0 and k == 0:
+                                ionMass = ionMass / float(i)
+                                z = i
+                                massDictionary[ionMass] = f"[{l}M + {x}TFA esters + {i}H]{z}+"
+
+                            # Na masses
+                            elif i == 0 and j >= 1 and k == 0:
+                                ionMass = ionMass / float(j)
+                                z = j
+                                massDictionary[ionMass] = f"[{l}M + {x}TFA esters + {j}Na]{z}+"
+
+                            # K masses
+                            elif i == 0 and j == 0 and k >= 1:
+                                ionMass = ionMass / float(k)
+                                z = k
+                                massDictionary[ionMass] = f"[{l}M + {x}TFA esters + {k}K]{z}+"
+
+                            # H Na masses
+                            elif i >= 1 and j >= 0 and k == 0:
+                                ionMass = ionMass / (float(i) + float(j))
+                                z = i + j
+                                massDictionary[ionMass] = f"[{l}M + {x}TFA esters + {i}H + {j}Na]{z}+"
+
+                            # H K masses
+                            elif i >= 1 and j == 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(k))
+                                z = i + k
+                                massDictionary[ionMass] = f"[{l}M + {x}TFA esters + {i}H + {k}K]{z}+"
+
+                            # Na K masses
+                            elif i == 0 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(j) + float(k))
+                                z = j + k
+                                massDictionary[ionMass] = f"[{l}M + {x}TFA esters + {j}Na + {k}K]{z}+"
+
+                            # H Na K masses
+                            elif i >= 1 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(j) + float(k))
+                                z = i + j + k
+                                massDictionary[ionMass] = f"[{l}M + {x}TFA esters + {i}H + {j}Na + {k}K]{z}+"
+                            else:
+                                continue
+
+                    # Calcualtes gunidinylations
+                    if numGuan > 0:
+                        for x in range(1, numGuan + 1):
+                            ionMass = (mass + dictOfAA['Guan']) * float(l) + (float(i) * H + float(j) * Na + float(k) * K )
+
+                            if i == 0 and j == 0 and k == 0:
+                                continue
+                            elif i + j + k > maxCharge:
+                                continue
+
+                            # H masses
+                            elif i >= 1 and j == 0 and k == 0:
+                                ionMass = ionMass / float(i)
+                                z = i
+                                massDictionary[ionMass] = f"[{l}M + {x}Guanidinylation + {i}H]{z}+"
+
+                            # Na masses
+                            elif i == 0 and j >= 1 and k == 0:
+                                ionMass = ionMass / float(j)
+                                z = j
+                                massDictionary[ionMass] = f"[{l}M + {x}Guanidinylation + {j}Na]{z}+"
+
+                            # K masses
+                            elif i == 0 and j == 0 and k >= 1:
+                                ionMass = ionMass / float(k)
+                                z = k
+                                massDictionary[ionMass] = f"[{l}M + {x}Guanidinylation + {k}K]{z}+"
+
+                            # H Na masses
+                            elif i >= 1 and j >= 0 and k == 0:
+                                ionMass = ionMass / (float(i) + float(j))
+                                z = i + j
+                                massDictionary[ionMass] = f"[{l}M + {x}Guanidinylation + {i}H + {j}Na]{z}+"
+
+                            # H K masses
+                            elif i >= 1 and j == 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(k))
+                                z = i + k
+                                massDictionary[ionMass] = f"[{l}M + {x}Guanidinylation + {i}H + {k}K]{z}+"
+
+                            # Na K masses
+                            elif i == 0 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(j) + float(k))
+                                z = j + k
+                                massDictionary[ionMass] = f"[{l}M + {x}Guanidinylation + {j}Na + {k}K]{z}+"
+
+                            # H Na K masses
+                            elif i >= 1 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(j) + float(k))
+                                z = i + j + k
+                                massDictionary[ionMass] = f"[{l}M + {x}Guanidinylation + {i}H + {j}Na + {k}K]{z}+"
+                            else:
+                                continue
+    return massDictionary
 
 # This function takes in the queryed mass, and the mass dictionary,
 # searches for a match within that dictionary
@@ -176,6 +451,17 @@ def getMassMatch(query, possibleMasses):
         matches.append("No matches found")
 
     return matches
+
+
+# This function writes all possible masses to a text file
+def writeMassDictionary(possibleMasses):
+    massFile = "possible masses.txt"
+    f = open(massFile, 'w')
+    for mass, ion in possibleMasses.items():
+        string = ion +' : ' + str(round(mass, 4))
+        f.write(string)
+        f.write('\n')
+    f.close()
 
 # For testing purposes
 if __name__ == '__main__':

@@ -38,4 +38,5 @@ while True:
         for match in matches:
             print(match)
     except:
+        writeMassDictionary(possibleMasses)
         quit()
