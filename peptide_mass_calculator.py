@@ -434,6 +434,188 @@ def populateMassDictionary(mass, sequence, uniqueAA, dictOfAA):
                                 massDictionary[ionMass] = f"[{l}M + {x}Guanidinylation + {i}H + {j}Na + {k}K]{z}+"
                             else:
                                 continue
+
+                    #single deletions
+                    for aminoAcid in uniqueAA:
+                        ionMassAdd = (mass + dictOfAA[aminoAcid]) * float(l) + (float(i) * H + float(j) * Na + float(k) * K )
+                        ionMassDel = (mass - dictOfAA[aminoAcid]) * float(l) + (float(i) * H + float(j) * Na + float(k) * K )
+
+                        if i == 0 and j == 0 and k == 0:
+                            continue
+                        elif i + j + k > maxCharge:
+                            continue
+
+                        # H masses
+                        elif i >= 1 and j == 0 and k == 0:
+                            ionMass = ionMass / float(i)
+                            z = i
+                            massDictionary[ionMassAdd] = f"[{l}M + {aminoAcid} + {i}H]{z}+"
+                            massDictionary[ionMassDel] = f"[{l}M - {aminoAcid} + {i}H]{z}+"
+
+                        # Na masses
+                        elif i == 0 and j >= 1 and k == 0:
+                            ionMass = ionMass / float(j)
+                            z = j
+                            massDictionary[ionMassAdd] = f"[{l}M + {aminoAcid} + {j}Na]{z}+"
+                            massDictionary[ionMassDel] = f"[{l}M - {aminoAcid} + {j}Na]{z}+"
+
+                        # K masses
+                        elif i == 0 and j == 0 and k >= 1:
+                            ionMass = ionMass / float(k)
+                            z = k
+                            massDictionary[ionMassAdd] = f"[{l}M + {aminoAcid} + {k}K]{z}+"
+                            massDictionary[ionMassDel] = f"[{l}M - {aminoAcid} + {k}K]{z}+"
+
+                        # H Na masses
+                        elif i >= 1 and j >= 0 and k == 0:
+                            ionMass = ionMass / (float(i) + float(j))
+                            z = i + j
+                            massDictionary[ionMassAdd] = f"[{l}M + {aminoAcid} + {i}H + {j}Na]{z}+"
+                            massDictionary[ionMassDel] = f"[{l}M - {aminoAcid} + {i}H + {j}Na]{z}+"
+
+                        # H K masses
+                        elif i >= 1 and j == 0 and k >= 0:
+                            ionMass = ionMass / (float(i) + float(k))
+                            z = i + k
+                            massDictionary[ionMassAdd] = f"[{l}M + {aminoAcid} + {i}H + {k}K]{z}+"
+                            massDictionary[ionMassDel] = f"[{l}M - {aminoAcid} + {i}H + {k}K]{z}+"
+
+                        # Na K masses
+                        elif i == 0 and j >= 0 and k >= 0:
+                            ionMass = ionMass / (float(j) + float(k))
+                            z = j + k
+                            massDictionary[ionMassAdd] = f"[{l}M + {aminoAcid} + {j}Na + {k}K]{z}+"
+                            massDictionary[ionMassDel] = f"[{l}M - {aminoAcid} + {j}Na + {k}K]{z}+"
+
+                        # H Na K masses
+                        elif i >= 1 and j >= 0 and k >= 0:
+                            ionMass = ionMass / (float(i) + float(j) + float(k))
+                            z = i + j + k
+                            massDictionary[ionMassAdd] = f"[{l}M + {aminoAcid} + {i}H + {j}Na + {k}K]{z}+"
+                            massDictionary[ionMassDel] = f"[{l}M - {aminoAcid} + {i}H + {j}Na + {k}K]{z}+"
+                        else:
+                            continue
+
+                        # double deletions and double additions
+                        for secondAminoAcid in uniqueAA:
+
+                            # double additions
+                            # this loop doesnt need to worry about redundancy in sequence
+                            ionMassDA = (mass + dictOfAA[aminoAcid] + dictOfAA[secondAminoAcid]) * float(l) + (float(i) * H + float(j) * Na + float(k) * K )
+
+                            if i == 0 and j == 0 and k == 0:
+                                continue
+                            elif i + j + k > maxCharge:
+                                continue
+
+                            # H masses
+                            elif i >= 1 and j == 0 and k == 0:
+                                ionMass = ionMass / float(i)
+                                z = i
+                                massDictionary[ionMassDA] = f"[{l}M + {aminoAcid} + {secondAminoAcid} + {i}H]{z}+"
+
+                            # Na masses
+                            elif i == 0 and j >= 1 and k == 0:
+                                ionMass = ionMass / float(j)
+                                z = j
+                                massDictionary[ionMassDA] = f"[{l}M + {aminoAcid} + {secondAminoAcid} + {j}Na]{z}+"
+
+                            # K masses
+                            elif i == 0 and j == 0 and k >= 1:
+                                ionMass = ionMass / float(k)
+                                z = k
+                                massDictionary[ionMassDA] = f"[{l}M + {aminoAcid} + {secondAminoAcid} + {k}K]{z}+"
+
+                            # H Na masses
+                            elif i >= 1 and j >= 0 and k == 0:
+                                ionMass = ionMass / (float(i) + float(j))
+                                z = i + j
+                                massDictionary[ionMassDA] = f"[{l}M + {aminoAcid} + {secondAminoAcid} + {i}H + {j}Na]{z}+"
+
+                            # H K masses
+                            elif i >= 1 and j == 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(k))
+                                z = i + k
+                                massDictionary[ionMassDA] = f"[{l}M + {aminoAcid} + {secondAminoAcid} + {i}H + {k}K]{z}+"
+
+                            # Na K masses
+                            elif i == 0 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(j) + float(k))
+                                z = j + k
+                                massDictionary[ionMassDA] = f"[{l}M + {aminoAcid} + {secondAminoAcid} + {j}Na + {k}K]{z}+"
+
+                            # H Na K masses
+                            elif i >= 1 and j >= 0 and k >= 0:
+                                ionMass = ionMass / (float(i) + float(j) + float(k))
+                                z = i + j + k
+                                massDictionary[ionMassDA] = f"[{l}M + {aminoAcid} + {secondAminoAcid} + {i}H + {j}Na + {k}K]{z}+"
+                            else:
+                                continue
+
+
+
+                            #double deletions
+                            # this loop counts how many times a given amino acid is in the sequence
+                            # it makes sure that a double deletion acutally makes sense
+                            numY = 0
+                            for AA in sequence:
+                                if AA == secondAminoAcid:
+                                    numY += 1
+
+                            if secondAminoAcid == aminoAcid and numY < 2:
+                                continue
+                            else:
+                                ionMassDD = (mass - dictOfAA[aminoAcid] - dictOfAA[secondAminoAcid]) * float(l) + (float(i) * H + float(j) * Na + float(k) * K )
+
+                                if i == 0 and j == 0 and k == 0:
+                                    continue
+                                elif i + j + k > maxCharge:
+                                    continue
+
+                                # H masses
+                                elif i >= 1 and j == 0 and k == 0:
+                                    ionMass = ionMass / float(i)
+                                    z = i
+                                    massDictionary[ionMassDD] = f"[{l}M - {aminoAcid} - {secondAminoAcid} + {i}H]{z}+"
+
+                                # Na masses
+                                elif i == 0 and j >= 1 and k == 0:
+                                    ionMass = ionMass / float(j)
+                                    z = j
+                                    massDictionary[ionMassDD] = f"[{l}M - {aminoAcid} - {secondAminoAcid} + {j}Na]{z}+"
+
+                                # K masses
+                                elif i == 0 and j == 0 and k >= 1:
+                                    ionMass = ionMass / float(k)
+                                    z = k
+                                    massDictionary[ionMassDD] = f"[{l}M - {aminoAcid} - {secondAminoAcid} + {k}K]{z}+"
+
+                                # H Na masses
+                                elif i >= 1 and j >= 0 and k == 0:
+                                    ionMass = ionMass / (float(i) + float(j))
+                                    z = i + j
+                                    massDictionary[ionMassDD] = f"[{l}M - {aminoAcid} - {secondAminoAcid} + {i}H + {j}Na]{z}+"
+
+                                # H K masses
+                                elif i >= 1 and j == 0 and k >= 0:
+                                    ionMass = ionMass / (float(i) + float(k))
+                                    z = i + k
+                                    massDictionary[ionMassDD] = f"[{l}M - {aminoAcid} - {secondAminoAcid} + {i}H + {k}K]{z}+"
+
+                                # Na K masses
+                                elif i == 0 and j >= 0 and k >= 0:
+                                    ionMass = ionMass / (float(j) + float(k))
+                                    z = j + k
+                                    massDictionary[ionMassDD] = f"[{l}M - {aminoAcid} - {secondAminoAcid} + {j}Na + {k}K]{z}+"
+
+                                # H Na K masses
+                                elif i >= 1 and j >= 0 and k >= 0:
+                                    ionMass = ionMass / (float(i) + float(j) + float(k))
+                                    z = i + j + k
+                                    massDictionary[ionMassDD] = f"[{l}M - {aminoAcid} - {secondAminoAcid} + {i}H + {j}Na + {k}K]{z}+"
+                                else:
+                                    continue
+
     return massDictionary
 
 # This function takes in the queryed mass, and the mass dictionary,
